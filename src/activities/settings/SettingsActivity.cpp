@@ -107,8 +107,7 @@ StrId settingsGroupLabel(int group, int category) {
                          : system[group];
 }
 StrId settingHelp(const SettingInfo& setting) {
-  if (setting.valuePtr == &CrossPointSettings::sideLeftAction ||
-      setting.valuePtr == &CrossPointSettings::sideRightAction)
+  if (setting.nameId == StrId::STR_SIDE_LEFT_ACTION || setting.nameId == StrId::STR_SIDE_RIGHT_ACTION)
     return StrId::STR_SIDE_ACTION_HELP;
   if (setting.valuePtr == &CrossPointSettings::xtcInvertPageDirection) return StrId::STR_XTC_INVERT_DIRECTION_HELP;
   if (setting.valuePtr == &CrossPointSettings::removeReadBooksFromRecents ||
@@ -266,7 +265,8 @@ void SettingsActivity::rebuildSettingsLists() {
   readerSettings.insert(readerSettings.begin() + 1,
                         SettingInfo::Action(StrId::STR_MANAGE_FONTS, SettingAction::DownloadFonts));
   readerSettings.push_back(SettingInfo::Action(StrId::STR_CUSTOMISE_STATUS_BAR, SettingAction::CustomiseStatusBar));
-  displaySettings.push_back(SettingInfo::Action(StrId::STR_QUICK_CUSTOMISE, SettingAction::QuickSettings));
+  if (Frontlight.present())
+    displaySettings.push_back(SettingInfo::Action(StrId::STR_QUICK_CUSTOMISE, SettingAction::QuickSettings));
 
   // Stable insertion ordering uses the existing vectors without a sorting allocation.
   std::vector<SettingInfo>* categories[] = {&displaySettings, &readerSettings, &controlsSettings, &systemSettings};
@@ -528,11 +528,9 @@ void SettingsActivity::toggleCurrentSetting() {
   const bool sleepScreenChanged = setting.valuePtr == &CrossPointSettings::sleepScreen;
   const bool quickResumeTimeoutChanged = setting.valuePtr == &CrossPointSettings::quickResumeSleepScreen;
 
-  if (setting.valuePtr == &CrossPointSettings::sideLeftAction ||
-      setting.valuePtr == &CrossPointSettings::sideRightAction) {
-    const auto binding = setting.valuePtr == &CrossPointSettings::sideLeftAction
-                             ? HomeButtonSettingsActivity::Binding::SideLeft
-                             : HomeButtonSettingsActivity::Binding::SideRight;
+  if (setting.nameId == StrId::STR_SIDE_LEFT_ACTION || setting.nameId == StrId::STR_SIDE_RIGHT_ACTION) {
+    const auto binding = setting.nameId == StrId::STR_SIDE_LEFT_ACTION ? HomeButtonSettingsActivity::Binding::SideLeft
+                                                                       : HomeButtonSettingsActivity::Binding::SideRight;
     auto next = makeUniqueNoThrow<HomeButtonSettingsActivity>(renderer, mappedInput, binding);
     if (!next) {
       LOG_ERR("SET", "OOM: side button settings");

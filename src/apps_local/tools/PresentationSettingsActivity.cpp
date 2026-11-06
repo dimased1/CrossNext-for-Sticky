@@ -1,5 +1,6 @@
 #include "PresentationSettingsActivity.h"
 
+#include <BoardConfig.h>
 #include <ChromeRegion.h>
 #include <CrossPointSettings.h>
 #include <I18n.h>
@@ -34,7 +35,8 @@ int PresentationSettingsActivity::listCount() const {
       return sizeof(formats) / sizeof(formats[0]);
     case Kind::FontOverview:
     case Kind::ThemeOverview:
-      return menufont::kSectionCount;
+      // Controls is the last section and belongs to the frontlight panel.
+      return menufont::kSectionCount - (BoardConfig::isSticky() ? 1 : 0);
     case Kind::GameFonts:
     case Kind::AppFonts:
       return shelf::folders()[fontFolder()].count + 1;

@@ -1,186 +1,85 @@
-<h1 align="center">
-  <img src="site/assets/logo.svg#gh-light-mode-only" width="72" alt="CrossNext"><img src="site/assets/logo-dark.svg#gh-dark-mode-only" width="72" alt="CrossNext"><br>
-  CrossNext
-</h1>
+# CrossNext for Seeed reTerminal Sticky (Tiếng Việt)
 
-[Español](README.es.md) · [Changes and upstream credits](docs/crossnext-changes.md) · [Installation](docs/install.md)
+Bản phân phối **CrossNext** được tối ưu hóa cho phần cứng **Seeed reTerminal Sticky** (ESP32-S3), tích hợp **bản địa hóa Tiếng Việt hoàn chỉnh 100%**, khắc phục lỗi hiển thị chữ hoa/thường tiếng Việt và tinh chỉnh các cài đặt phần cứng phù hợp với Sticky.
 
-CrossNext brings reading, study tools and games to the **Xteink X4 Pro**.
-Read a book, save new vocabulary, review flashcards, track your reading and take
-a break with a game, all on the same e-ink device.
+---
 
-[![Support me on Ko-fi](site/assets/support-ko-fi.svg)](https://ko-fi.com/manuelx900)
+## 🌟 Tín chỉ & Lời cảm ơn (Credits & Acknowledgements)
 
-Choose Framed, Carousel, Carousel 2 or Bookshelf for Home, arrange your own app and game
-shortcuts, and adjust the fonts, reading controls and sleep wallpapers to suit you.
-This release supports **X4 Pro only** (ESP32-S3).
+Dự án này được xây dựng và phát triển dựa trên các công trình nguồn mở xuất sắc:
 
-CrossNext is based on [CrossPlay 1.14.2](https://github.com/ma-r-s/crossplay)
-and [CrossPoint 1.6.5](https://github.com/crosspoint-reader/crosspoint-reader),
-with the FreeInk SDK. The reader and most games and apps come from those projects.
-CrossNext adapts their interface, navigation and study workflows. Additional
-references include [CrossInk](https://github.com/uxjulia/CrossInk),
-[CrossDiTo](https://github.com/dito94/CrossDiTo) and
-[VCodex](https://github.com/franssjz/cpr-vcodex); see the [credits](docs/crossnext-changes.md).
+- **[CrossNext](https://github.com/manuelx900/CrossNext)** bởi **[manuelx900](https://github.com/manuelx900)**: Tác giả firmware gốc CrossNext với giao diện Toybox, ứng dụng PET, kho sách, công cụ học tập và trò chơi e-ink phong phú.
+- **[CrossPoint Reader](https://github.com/crosspoint-reader/crosspoint-reader)** bởi **CrossPoint Organization**: Nền tảng hệ điều hành đọc sách nguồn mở e-reader cho ESP32.
+- **[CrossPlay](https://github.com/ma-r-s/crossplay)** bởi **ma-r-s** và các biến thể cộng đồng ([CrossInk](https://github.com/uxjulia/CrossInk), [CrossDiTo](https://github.com/dito94/CrossDiTo), [VCodex](https://github.com/franssjz/cpr-vcodex)).
+- **[Seeed Studio](https://www.seeedstudio.com/)**: Nhà sản xuất thiết bị phần cứng **reTerminal Sticky** (ESP32-S3, màn hình E-Ink 3.7", cảm ứng, Wi-Fi/BLE) và bộ SDK [freeink-sdk](https://github.com/Seeed-Studio).
 
-![CrossNext for Xteink X4 Pro](docs/images/overview.png)
+---
 
-## PET: your reading companion
+## ✨ Điểm nổi bật trên phiên bản này (Features)
 
-PET turns your reading routine into a story with a virtual companion. Choose an
-egg, name your pet and watch it grow as you read.
+1. **Bản địa hóa Tiếng Việt hoàn chỉnh (100% Vietnamese Localization)**:
+   - Toàn bộ 4,063 chuỗi ký tự giao diện (Settings, Reader, Bookshelf, Tools, Games, PET, Quản lý từ vựng, Thống kê...).
+   - Bổ sung tùy chọn ngôn ngữ **Tiếng Việt** trực tiếp trong menu **Cài đặt > Hệ thống > Ngôn ngữ**.
 
-- **Reading statistics:** follow your reading time, reading days and streaks.
-- **Difficulty and goals:** adjust the care difficulty and daily reading goal
-  to suit your routine.
-- **Daily care:** feed, clean and care for your pet, keeping an eye on its
-  needs and health.
-- **Games and affection:** pet your companion and play minigames to lift its mood.
-- **A home of its own:** unlock furnishings through reading and arrange its
-  room to your liking.
-- **Memories and generations:** discover memories as you progress, follow your
-  pet's life stages and revisit previous generations.
+2. **Khắc phục lỗi hiển thị chữ tiếng Việt (Typography & Casing Fix)**:
+   - Sửa thuật toán xử lý UTF-8 multi-byte trong `copyNatural()` và `copyCaps()` tại `PixelText.h`. Toàn bộ các nguyên âm tiếng Việt có dấu (À..Ỵ, Đ, Ă, Â, Ê, Ô, Ơ, Ư) được chuyển đổi hoa/thường chuẩn xác, không còn tình trạng bị xen kẽ chữ cao chữ thấp (như `CỜ vua`, `CỜ Đam`, `ChiẾn hẠm`).
+   - Sửa thanh tiêu đề thư mục (`ShelfFolderActivity.cpp`) hiển thị chuẩn uppercase tiếng Việt (`TRÒ CHƠI`, `ỨNG DỤNG`).
+   - Chuẩn hóa tên ứng dụng/trò chơi sang dạng viết hoa đầu từ tự nhiên (`Cờ vua`, `Cờ đam`, `Chiến hạm`, `Mật mã (The Intercept)`, `Dò mìn`...).
 
-![PET: status, care, home and memories](docs/images/pet.png)
+3. **Bàn phím & Nhãn điều khiển**:
+   - Giữ nguyên các ký tự và phím chức năng quốc tế trên bàn phím: `OK`, `Space`, `Shift`, `Del`, `ABC`, `?123` (không bị dịch sai thành "Được rồi" hay "không gian").
 
-Install **CrossNext-Resources.zip** on the microSD to use PET.
-See [PET's guide](docs/apps/pet.md) and
-[what's new in v1.4.0](docs/releases/CrossNext-v1.4.0.md).
+4. **Tối ưu hóa cho Seeed reTerminal Sticky**:
+   - Ẩn các cài đặt đèn nền / đèn vàng không có trên phần cứng Sticky.
+   - Sửa lỗi nút Home trong trình đọc sách (Epub Reader Home fix).
+   - Thiết lập cấu hình phím vật lý và quản lý nguồn tối ưu cho pin sạc reTerminal Sticky.
 
-The interface starts with Noto Sans. Choose Noto Sans, Ubuntu or Noto Serif
-globally, by section, or for an individual app or game. Reading fonts are
-configured separately. Saved Jersey 25 choices migrate to Noto Sans.
+---
 
-## Read, study and play
+## 🚀 Hướng dẫn nạp Firmware (Flashing Instructions)
 
-- EPUB, text, Markdown and XTC/XTCH reading, a file browser and a cover library.
-- Reading history, statistics, calendars and Reading Quest.
-- Flashcards imported from files/Anki, local FSRS review and a saved vocabulary app.
-- Independent title/question and content sizes: 10, 12, 14, 16 and 18 pt.
-  Smart sizing is enabled by default; long text keeps complete pagination.
-- Horizontal paging in supported app/puzzle selectors and study cards.
-- Anki image zoom uses a separate high-resolution copy only while enlarged;
-  normal cards keep the small preview. Rotation toggles between two positions.
-- Pomodoro's physical button starts and pauses; XTC/XTCH can reverse swipes
-  and page-tap zones for manga reading.
+### Tải Firmware
+Tải các file binary từ mục [Releases](https://github.com/loitq07/crossnext-sticky/releases):
+- `CrossNext-Sticky-v1.4.0-sticky-vi-factory.bin` (Bản nạp đầy đủ từ địa chỉ `0x0000`, bao gồm Bootloader + Partition table + Boot_app0 + App)
+- `CrossNext-Sticky-v1.4.0-sticky-vi-app.bin` (Chỉ phân vùng ứng dụng tại `0x10000`)
+- `CrossNext-Sticky-v1.4.0-sticky-vi.zip` (Gói cài đặt đầy đủ kèm hướng dẫn và patch)
 
-The active shelf contains these **16 games**:
-Chess (including puzzles), Checkers, Go, Minesweeper, Picross, Wordle, 2048,
-The Intercept, Battleship, Solitaire, Hearts, Murdle, Carnivore, Connect Four,
-Sudoku and Othello.
+### Cách 1: Nạp qua `esptool.py` (Khuyên dùng)
+Kết nối reTerminal Sticky với máy tính qua cáp USB-C, xác định cổng COM (ví dụ: `COM9` trên Windows hoặc `/dev/ttyUSB0` trên Linux/macOS):
 
-Its **13 app entries** are Reading Quest, PET, Habits, To Do List, Notes, Pomodoro,
-Wallpapers, Quotes, Flashcards, Words, Calendar, Clock and Counter.
+```bash
+esptool.py --chip esp32s3 --port COM9 --baud 921600 write_flash 0x0 CrossNext-Sticky-v1.4.0-sticky-vi-factory.bin
+```
 
-Fresh settings start in **English**. Spanish is available in the language
-settings; an existing installation keeps its saved language.
+Sau khi nạp xong, xóa phân vùng coredump nếu cần:
+```bash
+esptool.py --chip esp32s3 --port COM9 --baud 921600 erase_region 0xff0000 0x10000
+```
 
+### Cách 2: Nạp qua trình duyệt (Web Flasher)
+Bạn có thể sử dụng [ESP Web Tools](https://espressif.github.io/esptool-js/) trên Chrome/Edge và chọn nạp file `CrossNext-Sticky-v1.4.0-sticky-vi-factory.bin` tại địa chỉ `0x0`.
 
-## In pictures
+---
 
-### Two Home layouts
+## 🛠️ Hướng dẫn Build từ mã nguồn
 
-![Two Home layouts](docs/images/appearances.png)
+```bash
+# Cài đặt PlatformIO
+pip install platformio
 
-### Reading statistics
+# Tạo và kích hoạt môi trường ảo
+python -m venv .venv
+source .venv/bin/activate  # Hoặc .venv\Scripts\activate trên Windows
 
-![Reading statistics](docs/images/statistics.png)
+# Sinh file mã hóa ngôn ngữ C++
+python scripts/gen_i18n.py
 
-Optional **CrossPoint Sync** keeps your account history and new local reading in one statistics view. Read offline, then use the sync shortcut beside the battery to synchronize statistics and book positions together. Each book on the microSD keeps the furthest position from the reader or your account. The shortcut appears only after configuring a compatible sync account. See [reading statistics](docs/reading-stats.md#crosspoint-sync).
+# Biên dịch firmware cho reTerminal Sticky
+platformio run -e gh_release_sticky
+```
 
-### Games
+---
 
-![Games](docs/images/games.png)
+## 📄 Giấy phép (License)
 
-### Apps and productivity
-
-![Apps and productivity](docs/images/apps.png)
-
-### Flashcards and saved words
-
-![Flashcards and saved words](docs/images/study.png)
-
-### Reading controls
-
-![Reading controls](docs/images/reading.png)
-
-### Everyday tools
-
-![Everyday tools](docs/images/tools.png)
-
-## Install it
-
-Choose the package matching the device:
-
-| Model | ZIP | Application / SD update | Factory / USB installation |
-| --- | --- | --- | --- |
-| X4 Pro | `CrossNext-X4PRO-Firmware-v1.4.0.zip` | `CrossNext-X4PRO-Firmware-v1.4.0.bin` | `CrossNext-X4PRO-Firmware-v1.4.0-factory.bin` |
-
-Generated ZIPs are in `dist/`, and raw images in `dist/CrossNext/`.
-Each firmware ZIP includes SHA-256 checksums, model-specific images and notes.
-Application images belong in a compatible SD updater/OTA slot, or at `0x10000`;
-factory images contain the bootloader and partitions and belong at `0x0` over USB.
-Read [the installation guide](docs/install.md) and back up the microSD first.
-The plain X4/X3 use another chip; these packages do not target them or PaperMono.
-
-Use **Settings → Device → Check for Updates** to get updates from
-[CrossNext GitHub Releases](https://github.com/manuelx900/CrossNext/releases).
-The updater checks for a newer version and asks before installing the X4 Pro
-application. Release maintainers attach `CrossNext-X4PRO-OTA.bin` alongside the
-versioned ZIP; see [online updates](docs/install.md#online-update-source).
-
-`CrossNext-Resources.zip` contains reader fonts, dictionaries and the contents
-required by Reading Quest, PET and The Intercept. Merge its folders into the
-microSD root and preserve its licences. Install the updated resources with this
-firmware; an older pack may be missing the new app contents.
-It contains no firmware or personal reading/game history.
-
-`CrossNext-source.zip` is the clean source export, including required SDK sources,
-assets, tests and notices. Firmware/resources ZIPs are release attachments and
-do not need to enter the source repository's Git history.
-
-## Try the local simulator
-
-Follow [Windows setup](docs/simulator-windows.md#setup-from-a-source-export), then
-run `Start-Simulator.cmd`. The local browser opens `http://127.0.0.1:8765/` and
-runs the firmware from these sources. The showcase supplies books with original
-notices, synthetic statistics, files and saved app/game examples for screenshots.
-It uses separate demonstration data rather than the reader's personal records.
-
-See [the showcase guide](docs/simulator-showcase.md). Browser-specific network
-and sleep adaptations are described in [the site documentation](site/README.md).
-The original [CrossPlay demo](https://crossplay.ma-r-s.com) is maintained upstream.
-
-## Develop and verify
-
-Use `x4pro` for the device and `simulator_x4_pro` for the simulator;
-the upstream `default` environment targets a different chip. In a configured
-development checkout, run `./scripts_local/check.sh` from your own worktree.
-Use the repository's `./bin/clang-format-fix -g` wrapper for changed C/C++ files.
-Read the [contributor guide](docs/contributing/getting-started.md) and
-[local script documentation](scripts_local/README.md) before changing firmware.
-Inherited CrossPlay automation is restricted to its original repository; CrossNext
-releases are published manually.
-
-Useful feature details: [Flashcards](docs/apps/flashcards-ui.md),
-[Words](docs/apps/words.md), [Pomodoro](docs/pomodoro.md),
-[Library performance](docs/library-performance.md) and
-[the render audit](docs/render-performance.md).
-Builds, native tests and simulator checks do not replace physical-device testing
-of display refresh, SD behavior, memory and all orientations before publication.
-
-## Licence and attribution
-
-Keep [LICENSE](LICENSE), original copyright notices and bundled asset licences.
-CrossPlay supplies the app/game shelf and implementations; CrossPoint supplies
-the e-reader foundation. [CrossNext changes](docs/crossnext-changes.md) describes
-this fork's adaptations without claiming those inherited projects as new work.
-
-[What’s new in v1.4.0](docs/releases/CrossNext-v1.4.0.md)
-
-## Support CrossNext
-
-Thank you for using CrossNext and helping it improve. If you would like to support
-its ongoing development, please consider supporting me on Ko-fi.
-
-[![Support me on Ko-fi](site/assets/support-ko-fi.svg)](https://ko-fi.com/manuelx900)
+Dự án tuân theo giấy phép nguồn mở của các dự án gốc CrossNext và CrossPoint (GPL / MIT tương ứng). Vui lòng tôn trọng bản quyền và ghi nhận tác giả gốc khi phân phối lại.

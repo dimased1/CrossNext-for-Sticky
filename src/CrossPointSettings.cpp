@@ -250,6 +250,19 @@ bool CrossPointSettings::fromJson(JsonVariantConst doc) {
     }
   }
 
+  if (BoardConfig::isSticky()) {
+    for (auto* action : {&sideLeftAction, &sideRightAction}) {
+      if (!sideActionHardwareAvailable(SideButtonAction(*action), false, false, false)) {
+        *action = uint8_t(SideButtonAction::Navigation);
+        needsResave = true;
+      }
+    }
+    if (touchScreenLocked) {
+      touchScreenLocked = 0;
+      needsResave = true;
+    }
+  }
+
   const auto normalizedFont = uint8_t(menufont::normalized(menuFontStyle));
   if (menuFontStyle != normalizedFont) needsResave = true;
   menuFontStyle = normalizedFont;

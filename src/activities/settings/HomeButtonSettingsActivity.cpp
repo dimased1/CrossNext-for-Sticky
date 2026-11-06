@@ -53,11 +53,9 @@ int HomeButtonSettingsActivity::shortcutIndex() const {
   return binding == Binding::Home ? int(HomeButtonAction::OpenShortcut) : int(SideButtonAction::OpenShortcut);
 }
 int HomeButtonSettingsActivity::actionAt(int row) const {
-  const int count = binding == Binding::Home ? HOME_ACTION_COUNT : int(SideButtonAction::Count);
-  for (int action = 0; action < count; ++action) {
-    const bool selectable = binding == Binding::Home ? selectableHomeAction(HomeButtonAction(action))
-                                                     : selectableSideAction(SideButtonAction(action));
-    if (selectable && row-- == 0) return action;
+  if (binding != Binding::Home) return side_button::actionAt(row);
+  for (int action = 0; action < HOME_ACTION_COUNT; ++action) {
+    if (selectableHomeAction(HomeButtonAction(action)) && row-- == 0) return action;
   }
   return -1;
 }

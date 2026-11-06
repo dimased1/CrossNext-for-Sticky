@@ -6,12 +6,76 @@
 namespace pixelui {
 // Use translated mixed case as supplied; soften display-only all-caps labels.
 enum class LabelCase { Sentence, Preserve };
+
+inline bool isUtf8Lower(const unsigned char* p, size_t bytes) {
+  if (bytes == 1) return *p >= 'a' && *p <= 'z';
+  if (bytes == 2) {
+    if (*p == 0xC3 && p[1] >= 0xA0 && p[1] <= 0xBE && p[1] != 0xB7) return true;
+    if (*p == 0xC4 && (p[1] == 0x83 || p[1] == 0x91 || p[1] == 0xA9)) return true;
+    if (*p == 0xC5 && p[1] == 0xA9) return true;
+    if (*p == 0xC6 && (p[1] == 0xA1 || p[1] == 0xB0)) return true;
+  } else if (bytes == 3) {
+    if (*p == 0xE1 && (p[1] == 0xBA || p[1] == 0xBB) && (p[2] & 1)) return true;
+  }
+  return false;
+}
+
+inline void utf8ToLower(char* out, size_t bytes) {
+  auto* p = reinterpret_cast<unsigned char*>(out);
+  if (bytes == 1) {
+    if (*p >= 'A' && *p <= 'Z') *p = static_cast<unsigned char>(*p + 'a' - 'A');
+  } else if (bytes == 2) {
+    if (*p == 0xC3 && p[1] >= 0x80 && p[1] <= 0x9E && p[1] != 0x97) {
+      p[1] = static_cast<unsigned char>(p[1] + 0x20);
+    } else if (*p == 0xC4 && (p[1] == 0x82 || p[1] == 0x90 || p[1] == 0xA8)) {
+      p[1] = static_cast<unsigned char>(p[1] + 1);
+    } else if (*p == 0xC5 && p[1] == 0xA8) {
+      p[1] = static_cast<unsigned char>(p[1] + 1);
+    } else if (*p == 0xC6) {
+      if (p[1] == 0xA0) p[1] = 0xA1;
+      else if (p[1] == 0xAF) p[1] = 0xB0;
+    }
+  } else if (bytes == 3) {
+    if (*p == 0xE1 && (p[1] == 0xBA || p[1] == 0xBB) && ((p[2] & 1) == 0)) {
+      p[2] = static_cast<unsigned char>(p[2] + 1);
+    }
+  }
+}
+
+inline void utf8ToUpper(char* out, size_t bytes) {
+  auto* p = reinterpret_cast<unsigned char*>(out);
+  if (bytes == 1) {
+    if (*p >= 'a' && *p <= 'z') *p = static_cast<unsigned char>(*p - 'a' + 'A');
+  } else if (bytes == 2) {
+    if (*p == 0xC3 && p[1] >= 0xA0 && p[1] <= 0xBE && p[1] != 0xB7) {
+      p[1] = static_cast<unsigned char>(p[1] - 0x20);
+    } else if (*p == 0xC4 && (p[1] == 0x83 || p[1] == 0x91 || p[1] == 0xA9)) {
+      p[1] = static_cast<unsigned char>(p[1] - 1);
+    } else if (*p == 0xC5 && p[1] == 0xA9) {
+      p[1] = static_cast<unsigned char>(p[1] - 1);
+    } else if (*p == 0xC6) {
+      if (p[1] == 0xA1) p[1] = 0xA0;
+      else if (p[1] == 0xB0) p[1] = 0xAF;
+    }
+  } else if (bytes == 3) {
+    if (*p == 0xE1 && (p[1] == 0xBA || p[1] == 0xBB) && ((p[2] & 1) == 1)) {
+      p[2] = static_cast<unsigned char>(p[2] - 1);
+    }
+  }
+}
+
 inline bool copyNatural(char* out, size_t size, const char* text, LabelCase casing = LabelCase::Sentence) {
   if (!size) return false;
   if (!text) text = "";
   bool mixed = false;
-  for (const unsigned char* p = reinterpret_cast<const unsigned char*>(text); *p; ++p)
-    if ((*p >= 'a' && *p <= 'z') || (*p == 0xC3 && p[1] >= 0xA0 && p[1] <= 0xBE && p[1] != 0xB7)) mixed = true;
+  for (const unsigned char* p = reinterpret_cast<const unsigned char*>(text); *p; ) {
+    const size_t bytes = *p < 0x80 ? 1 : *p < 0xE0 ? 2 : *p < 0xF0 ? 3 : 4;
+    if (isUtf8Lower(p, bytes)) {
+      mixed = true;
+      break;
+    }
+    p += bytes;
+  }
   size_t n = 0;
   bool first = true, unicode = false;
   while (*text && n + 1 < size) {
@@ -23,12 +87,7 @@ inline bool copyNatural(char* out, size_t size, const char* text, LabelCase casi
     if (!complete) break;
     std::memmove(out + n, text, bytes);
     if (casing == LabelCase::Sentence && !mixed && !first) {
-      if (bytes == 1 && ch >= 'A' && ch <= 'Z')
-        out[n] = char(ch + 'a' - 'A');
-      else if (bytes == 2 && ch == 0xC3) {
-        const auto tail = static_cast<unsigned char>(out[n + 1]);
-        if (tail >= 0x80 && tail <= 0x9E && tail != 0x97) out[n + 1] = char(tail + 0x20);
-      }
+      utf8ToLower(out + n, bytes);
     }
     if (ch != ' ' && ch != '\t') first = false;
     unicode |= bytes > 1;
@@ -38,7 +97,8 @@ inline bool copyNatural(char* out, size_t size, const char* text, LabelCase casi
   out[n] = '\0';
   return unicode;
 }
-// Preserve complete UTF-8 codepoints and uppercase Latin-1 letters.
+
+// Preserve complete UTF-8 codepoints and uppercase Latin-1 and Vietnamese letters.
 inline bool copyCaps(char* out, const size_t size, const char* text) {
   if (!size) return false;
   if (!text) text = "";
@@ -62,16 +122,9 @@ inline bool copyCaps(char* out, const size_t size, const char* text) {
       }
     }
     if (n + bytes >= size) break;
-    if (bytes == 1)
-      out[n++] = ch >= 'a' && ch <= 'z' ? ch - 'a' + 'A' : ch;
-    else {
-      std::memmove(out + n, text, bytes);
-      if (ch == 0xC3) {
-        const auto tail = static_cast<unsigned char>(out[n + 1]);
-        if (tail >= 0xA0 && tail <= 0xBE && tail != 0xB7) out[n + 1] = static_cast<char>(tail - 0x20);
-      }
-      n += bytes;
-    }
+    std::memmove(out + n, text, bytes);
+    utf8ToUpper(out + n, bytes);
+    n += bytes;
     text += bytes;
   }
   out[n] = '\0';

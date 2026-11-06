@@ -1,11 +1,21 @@
 #pragma once
 
+#include <BoardConfig.h>
+#include <HalFrontlight.h>
 #include <I18n.h>
 
 #include "CrossPointSettings.h"
 #include "util/SideButtonActions.h"
 
 namespace side_button {
+inline int actionAt(int row) {
+  return sideActionAt(row, Frontlight.present(), Frontlight.hasColorTemperature(),
+                      BoardConfig::hasTouch() && !BoardConfig::isSticky());
+}
+inline uint8_t actionRow(uint8_t value) {
+  return sideActionRow(value, Frontlight.present(), Frontlight.hasColorTemperature(),
+                       BoardConfig::hasTouch() && !BoardConfig::isSticky());
+}
 inline constexpr StrId LABELS[] = {StrId::STR_SIDE_NAVIGATION,
                                    StrId::STR_SLEEP,
                                    StrId::STR_TOGGLE_FRONTLIGHT,

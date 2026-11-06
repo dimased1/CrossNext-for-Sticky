@@ -5,6 +5,7 @@
 #include <cstdio>
 #include <cstring>
 #include <initializer_list>
+
 int main() {
   static constexpr UiLabel absent = nullptr;
   assert(absent.get() == nullptr && UiLabel{}.get() == nullptr);
@@ -20,7 +21,10 @@ int main() {
   I18N.setLanguage(Language::EN);
   I18N.setLanguage(Language::ES);
   assert(std::strcmp(label.get(), "Héroe") == 0);
-  assert(sizeof(SORTED_LANGUAGE_INDICES) == 2);
+  bool vietnameseVisible = false;
+  for (const auto language : SORTED_LANGUAGE_INDICES)
+    if (language == static_cast<uint8_t>(Language::VI)) vietnameseVisible = true;
+  assert(sizeof(SORTED_LANGUAGE_INDICES) == (vietnameseVisible ? 3 : 2));
   const auto index = static_cast<unsigned>(StrId::STR_WALLPAPER_NOTE_CBA12088);
   // This late source entry crosses the former 15-bit offset limit.
   assert(i18n_strings::OFFSETS_EN[index] > 32767);
@@ -36,8 +40,17 @@ int main() {
     }
   }
   assert(fallback > 0);
+  if (vietnameseVisible) {
+    I18N.setLanguage(Language::VI);
+    assert(std::strcmp(tr(STR_SETTINGS_TITLE), "Cài đặt") == 0);
+    assert(std::strcmp(tr(STR_GO_HOME_BUTTON), "Về màn hình chính") == 0);
+    assert(std::strcmp(tr(STR_READER_SEARCH), "Tìm trong sách") == 0);
+    assert(std::strcmp(I18N.getLanguageName(Language::VI), "Tiếng Việt") == 0);
+    // Game/story content retains the same per-key English fallback contract.
+    assert(std::strcmp(label.get(), "anh hùng") == 0 || std::strcmp(label.get(), "Hero") == 0);
+  }
   I18N.setLanguage(Language::EN);
   assert(std::strcmp(label.get(), "Hero") == 0);
-  std::printf("Bilingual labels, late offsets, %u shared English fallback entries and two visible languages passed.\n",
-              fallback);
+  std::printf("Localized labels, late offsets, %u English fallback entries and %zu visible languages passed.\n",
+              fallback, sizeof(SORTED_LANGUAGE_INDICES));
 }

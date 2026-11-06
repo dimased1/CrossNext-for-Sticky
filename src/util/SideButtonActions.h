@@ -88,3 +88,25 @@ constexpr bool selectableSideAction(SideButtonAction action) {
   return action < SideButtonAction::Count && action != SideButtonAction::Dictionary &&
          action != SideButtonAction::SaveClipping && action != SideButtonAction::Footnotes;
 }
+
+constexpr bool sideActionHardwareAvailable(SideButtonAction action, bool frontlight, bool warmLight, bool touchLock) {
+  return action < SideButtonAction::Count && (action != SideButtonAction::ToggleFrontlight || frontlight) &&
+         (action != SideButtonAction::ToggleWarmth || warmLight) &&
+         (action != SideButtonAction::ToggleTouchscreen || touchLock);
+}
+
+constexpr int sideActionAt(int row, bool frontlight, bool warmLight, bool touchLock) {
+  for (int value = 0; value < int(SideButtonAction::Count); ++value) {
+    const auto action = SideButtonAction(value);
+    if (selectableSideAction(action) && sideActionHardwareAvailable(action, frontlight, warmLight, touchLock) &&
+        row-- == 0)
+      return value;
+  }
+  return -1;
+}
+
+constexpr uint8_t sideActionRow(uint8_t value, bool frontlight, bool warmLight, bool touchLock) {
+  for (int row = 0; sideActionAt(row, frontlight, warmLight, touchLock) >= 0; ++row)
+    if (sideActionAt(row, frontlight, warmLight, touchLock) == value) return uint8_t(row);
+  return 0;
+}

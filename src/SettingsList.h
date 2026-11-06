@@ -668,6 +668,35 @@ inline std::vector<SettingInfo> getSettingsList(const SdCardFontRegistry* regist
 
   std::vector<SettingInfo> v = baseList;
   if (!forPersistence) {
+    if (BoardConfig::isSticky()) {
+      v.erase(std::remove_if(v.begin(), v.end(),
+                             [](const SettingInfo& s) {
+                               return s.nameId == StrId::STR_LONG_PRESS_MENU ||
+                                      (s.key && std::strncmp(s.key, "homeButton", 10) == 0) ||
+                                      s.valuePtr == &CrossPointSettings::frontlightBrightness ||
+                                      s.valuePtr == &CrossPointSettings::frontlightWarmth ||
+                                      s.valuePtr == &CrossPointSettings::frontlightWarmthMemory ||
+                                      s.valuePtr == &CrossPointSettings::frontlightOn ||
+                                      s.valuePtr == &CrossPointSettings::frontlightRestoreOnWake;
+                             }),
+              v.end());
+    }
+    // Display indices are filtered; persisted action IDs stay unchanged.
+    for (auto& s : v) {
+      if (s.valuePtr != &CrossPointSettings::sideLeftAction && s.valuePtr != &CrossPointSettings::sideRightAction)
+        continue;
+      const auto field = s.valuePtr;
+      std::vector<StrId> labels;
+      for (int row = 0; side_button::actionAt(row) >= 0; ++row)
+        labels.push_back(side_button::LABELS[side_button::actionAt(row)]);
+      s = SettingInfo::DynamicEnum(
+          s.nameId, std::move(labels), [field]() { return side_button::actionRow(SETTINGS.*field); },
+          [field](uint8_t row) {
+            const int action = side_button::actionAt(row);
+            if (action >= 0) SETTINGS.*field = uint8_t(action);
+          },
+          s.key, s.category);
+    }
     // Keep legacy keys loadable, but do not advertise unsupported controls on
     // the device or the web settings page. Appearance uses homeLayout.
     v.erase(std::remove_if(v.begin(), v.end(),
