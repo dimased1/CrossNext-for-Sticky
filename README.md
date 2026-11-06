@@ -54,7 +54,7 @@ This distribution is built on top of incredible open-source foundations. Sincere
 
 ## 🚀 Flashing & Installation
 
-Pre-built binaries are available on the [Releases page](https://github.com/loitq07/crossnext-sticky/releases).
+Pre-built binaries are available on the [Releases page](https://github.com/loitq07/CrossNext-for-Sticky/releases).
 
 ### Release Assets
 - `CrossNext-Sticky-v1.4.0-sticky-vi-factory.bin`: Full factory image flashed at offset `0x0000` (contains bootloader, partition table, boot_app0, and application).
@@ -93,8 +93,8 @@ You can use [ESP Web Tools (esptool-js)](https://espressif.github.io/esptool-js/
 
 ```bash
 # Clone the repository
-git clone https://github.com/loitq07/crossnext-sticky.git
-cd crossnext-sticky
+git clone https://github.com/loitq07/CrossNext-for-Sticky.git
+cd CrossNext-for-Sticky
 
 # Set up virtual environment
 python -m venv .venv
