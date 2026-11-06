@@ -57,9 +57,9 @@ This distribution is built on top of incredible open-source foundations. Sincere
 Pre-built binaries are available on the [Releases page](https://github.com/loitq07/CrossNext-for-Sticky/releases).
 
 ### Release Assets
-- `CrossNext-Sticky-v1.4.0-sticky-vi-factory.bin`: Full factory image flashed at offset `0x0000` (contains bootloader, partition table, boot_app0, and application).
-- `CrossNext-Sticky-v1.4.0-sticky-vi-app.bin`: Application partition only, flashed at offset `0x10000`.
-- `CrossNext-Sticky-v1.4.0-sticky-vi.zip`: Complete distribution package including binaries, patch, and checksums.
+- `CrossNext-Sticky-v1.4.0-factory.bin`: Full factory image flashed at offset `0x0000` (contains bootloader, partition table, boot_app0, and application).
+- `CrossNext-Sticky-v1.4.0-app.bin`: Application partition only, flashed at offset `0x10000`.
+- `CrossNext-Sticky-v1.4.0.zip`: Complete distribution package including binaries, patch, and checksums.
 
 ### Flashing via `esptool.py` (Recommended)
 
@@ -67,7 +67,7 @@ Connect your reTerminal Sticky to your computer via USB-C and identify the seria
 
 ```bash
 # Flash the complete factory firmware image
-esptool.py --chip esp32s3 --port <PORT> --baud 921600 write_flash 0x0 CrossNext-Sticky-v1.4.0-sticky-vi-factory.bin
+esptool.py --chip esp32s3 --port <PORT> --baud 921600 write_flash 0x0 CrossNext-Sticky-v1.4.0-factory.bin
 
 # Erase the coredump region
 esptool.py --chip esp32s3 --port <PORT> --baud 921600 erase_region 0xff0000 0x10000
@@ -78,7 +78,7 @@ esptool.py --chip esp32s3 --port <PORT> --baud 921600 erase_region 0xff0000 0x10
 ### Flashing via Web Browser (Web Flasher)
 You can use [ESP Web Tools (esptool-js)](https://espressif.github.io/esptool-js/) in Chrome or Edge:
 1. Connect the reTerminal Sticky via USB.
-2. Select your serial port and choose `CrossNext-Sticky-v1.4.0-sticky-vi-factory.bin` at offset `0x0`.
+2. Select your serial port and choose `CrossNext-Sticky-v1.4.0-factory.bin` at offset `0x0`.
 3. Click **Program**.
 
 ---
